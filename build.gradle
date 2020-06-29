@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.example'
+group = 'com.example.place'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
@@ -19,9 +19,16 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "it.ozimov:embedded-redis:0.7.2"
+
+    runtimeOnly 'com.h2database:h2'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

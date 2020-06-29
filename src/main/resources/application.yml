@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: place-search-service
+  profiles:
+    active: local
+
+
+
