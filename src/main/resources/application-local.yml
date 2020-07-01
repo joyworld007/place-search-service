@@ -31,7 +31,7 @@ logging:
 
 kakao-open-api:
   place-search-keyword:
-    url: https://dapi.kakao.com/v2/local/search/keyword.json
+    url: http://dapi.kakao.com/v2/local/search/keyword.json
     app-key: 20d860c465148014adda59453ca9adba
   place-detail:
     url: https://map.kakao.com/link/map/{id}

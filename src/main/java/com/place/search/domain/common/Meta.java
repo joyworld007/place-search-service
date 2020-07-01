@@ -1,6 +1,6 @@
 package com.place.search.domain.common;
 
-import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +12,10 @@ import lombok.ToString;
 @Getter
 @ToString
 @Builder
-public class ApiResponse {
+public class Meta {
 
-  private List documents;
-  private Meta meta;
+  private String is_end;
+  private Long pageable_count;
+  private Map same_name;
+  private Long total_count;
 }
