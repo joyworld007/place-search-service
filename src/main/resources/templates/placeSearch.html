@@ -1,73 +1,159 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:sec="" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>Place Search Service</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/search.css">
+  <meta charset="UTF-8">
+  <title>Place Search Service</title>
+  <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/search.css">
 </head>
 <body>
-    <div class="content">
-        <div class="container">
+<form name="searchForm">
+  <input type="hidden" id="page" name="page" value="1">
+  <input type="hidden" id="size" name="size" value="5">
+  <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="search-result-box card-box">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="search-result-box card-box">
-                        <div class="row">
-                            <div class="col-md-8 offset-md-2" style="text-align: right">
-                                <span sec:authentication="name"></span>님 안녕하세요...
-                                <a sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
-                            </div>
-                            <div class="col-md-8 offset-md-2">
-                                <div class="pt-3 pb-4">
-                                    <div class="input-group">
-                                        <input type="text" id="query" name="query" class="form-control" value="">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn waves-effect waves-light btn-custom"><i class="fa fa-search mr-1"></i> Search</button>
-                                        </div>
-                                    </div>
-                                    <div class="mt-4 text-center">
-                                        <h4>Search Results For "<span id="query_result"></span>"</h4></div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- end row -->
-                        <ul class="nav nav-tabs tabs-bordered">
-                            <li class="nav-item"><a href="#home" data-toggle="tab" aria-expanded="true" class="nav-link active">All results <span class="badge badge-success ml-1">325</span></a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="home">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="search-item">
-                                            <h4 class="mb-1"><a href="#">Bootdey.com - Responsive Admin Template</a></h4>
-                                            <div class="font-13 text-success mb-3">https://www.bootdey.com</div>
-                                            <p class="mb-0 text-muted">Dolor posuere proin blandit accumsan senectus netus nullam curae, ornare laoreet adipiscing luctus mauris adipiscing pretium eget fermentum, tristique lobortis est ut metus lobortis tortor tincidunt himenaeos habitant quis dictumst proin odio sagittis purus mi, nec taciti vestibulum quis in sit varius lorem sit metus mi.</p>
-                                        </div>
-
-                                        <ul class="pagination justify-content-end pagination-split mt-0">
-                                            <li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">«</span> <span class="sr-only">Previous</span></a></li>
-                                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                            <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                            <li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">»</span> <span class="sr-only">Next</span></a></li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+              <div class="col-md-8 offset-md-2" style="text-align: right">
+                <span class="mb-0 text-muted" sec:authentication="name"></span>님
+                <button class="icon_logout"><a class="mb-0 text-muted" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a></button>
+              </div>
+              <p></p>
+              <div class="col-md-8 offset-md-2">
+                <div class="pt-3 pb-4">
+                  <div class="input-group">
+                    <input type="text" id="query" name="query" class="form-control" value="">
+                    <div class="input-group-append">
+                      <button id="btn-search" type="button"
+                              class="btn waves-effect waves-light btn-custom"><i
+                          class="fa fa-search mr-1"></i> Search
+                      </button>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
             <!-- end row -->
-        </div>
-        <!-- container -->
-    </div>
+            <ul class="nav nav-tabs tabs-bordered" id="search-result-tab">
+              <li class="nav-item"><a href="#home" data-toggle="tab" aria-expanded="true"
+                                      class="nav-link active">검색결과 <span
+                  class="badge badge-success ml-1" id="result_count"></span></a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="search-result">
+                <div class="row">
+                  <!-- 검색 결과 List-->
+                  <div class="col-md-12" id="result-list"></div>
+                  <!-- 검색 결과 List-->
 
-    <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
-    <script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+                  <div id="paging" class="col-md-12">
+                    <ul class="pagination justify-content-end pagination-split mt-0">
+                      <li class="page-item"><a class="page-link" href="#"
+                                               aria-label="Previous"><span
+                          aria-hidden="true">«</span> <span class="sr-only">Previous</span></a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">4</a></li>
+                      <li class="page-item"><a class="page-link" href="#">5</a></li>
+                      <li class="page-item"><a class="page-link" href="#" aria-label="Next"><span
+                          aria-hidden="true">»</span> <span class="sr-only">Next</span></a></li>
+                    </ul>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end row -->
+    </div>
+    <!-- container -->
+  </div>
+</form>
+
+<script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+  let totalCount = 0;
+
+  function show(index) {
+    for (let i = 0; i < totalCount; i++) {
+      $('#detail' + i).hide();
+    }
+    $('#detail' + index).show();
+  }
+
+  function search() {
+    $('#result-list').html('');
+
+    if ($('#query').val() == '') {
+      return;
+    }
+    $.ajax(
+        {
+          type: "GET",
+          url: '/v1/place',
+          data: {
+            query: $('#query').val(),
+            page: $('#page').val(),
+            size: $('#size').val()
+          },
+          contentType: "application/json",
+          dataType: "text",
+          success: function (res) {
+            let obj = JSON.parse(res);
+            console.log(obj)
+            if (obj.code == 'SUCCESS') {
+
+              totalCount = obj.result.entry.documents.length;
+
+              $('#search-result').show();
+              $('#search-result-tab').show();
+              $('#result_count').text(obj.result.entry.meta.pageable_count)
+            }
+            for (let i = 0; i < obj.result.entry.documents.length; i++) {
+              let list = obj.result.entry.documents[i];
+              let html = '<div class="search-item" id="">';
+              html += '<h4 class="mb-1"><a href="javascript:show(' + i + ')">' + list.place_name
+                  + '</a></h4>';
+              html += '<div class="font-13 text-success mb-3">' + list.category_name + '</div>';
+
+              html += '<div id="detail' + i + '" style="display:none;>"';
+              html += '<p class="mb-0 text-muted"> 지번 : ' + list.address_name;
+              html += '</br> 도로명 주소 : ' + list.road_address_name;
+              html += '</br> 전화번호 : ' + list.phone;
+              html += '</br></br> <a href="https://map.kakao.com/link/map/'
+                  + list.id + '" target="_blank">Daum 지도 바로 가기</a></p>';
+              html += '</div>';
+
+              html += '</div>';
+              $('#result-list').append(html);
+            }
+
+          },
+          error: function (xhr, status, error) {
+            console.log(error);
+          }
+        }
+    );
+    return false;
+  }
+
+  $(document).ready(function () {
+
+    $('#result-list').html('');
+    $('#search-result').hide();
+    $('#search-result-tab').hide();
+
+    $('#btn-search').click(function () {
+      search();
+    });
+  });
+</script>
 
 </body>
 </html>

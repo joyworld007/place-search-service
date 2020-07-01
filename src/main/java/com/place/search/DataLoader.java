@@ -17,7 +17,5 @@ public class DataLoader implements ApplicationRunner {
     memberService.joinUser(MemberDto.builder().email("test1@gmail.com").password("1234").build());
     memberService.joinUser(MemberDto.builder().email("test2@gmail.com").password("1234").build());
     memberService.joinUser(MemberDto.builder().email("test3@gmail.com").password("1234").build());
-    memberService.joinUser(MemberDto.builder().email("test4@gmail.com").password("1234").build());
-    memberService.joinUser(MemberDto.builder().email("test5@gmail.com").password("1234").build());
   }
 }

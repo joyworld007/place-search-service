@@ -36,3 +36,16 @@ a {
 .btn-custom, .btn-danger, .btn-info, .btn-inverse, .btn-pink, .btn-primary, .btn-purple, .btn-success, .btn-warning {
     color: #fff!important;
 }
+
+.icon_logout {
+    border: 1px solid #d4d4d4;
+    width: 60px;
+    height: 20px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: -.05em;
+    line-height: 20px;
+    color: #515151;
+    background-color: #fff;
+    text-indent: 0;
+}
