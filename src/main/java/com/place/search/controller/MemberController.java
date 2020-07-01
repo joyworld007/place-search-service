@@ -16,12 +16,14 @@ public class MemberController {
   // 메인 페이지
   @GetMapping("/")
   public String index() {
-    return "/index";
+
+    return "redirect:/user/login";
   }
 
   // 회원가입 페이지
   @GetMapping("/user/signup")
   public String dispSignup() {
+
     return "/signup";
   }
 
@@ -36,36 +38,35 @@ public class MemberController {
   // 로그인 페이지
   @GetMapping("/user/login")
   public String dispLogin() {
+
     return "/login";
   }
 
-  // 로그인 결과 페이지
+  // 로그인 성공 페이지
   @GetMapping("/user/login/result")
   public String dispLoginResult() {
-    return "/loginSuccess";
+    return "redirect:/search";
+  }
+
+  // 로그인 실패 페이지
+  @GetMapping("/user/login/fail")
+  public String dispLoginFailResult() {
+
+    return "/loginFail";
   }
 
   // 로그아웃 결과 페이지
   @GetMapping("/user/logout/result")
   public String dispLogout() {
+
     return "/logout";
   }
 
   // 접근 거부 페이지
   @GetMapping("/user/denied")
   public String dispDenied() {
+
     return "/denied";
   }
 
-  // 내 정보 페이지
-  @GetMapping("/user/myinfo")
-  public String dispMyInfo() {
-    return "/myinfo";
-  }
-
-  // 어드민 페이지
-  @GetMapping("/admin")
-  public String dispAdmin() {
-    return "/admin";
-  }
 }

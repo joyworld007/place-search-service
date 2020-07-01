@@ -30,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(WebSecurity web) throws Exception {
-    web.ignoring().antMatchers("/css/**", "/js/**", "/img/**", "/lib/**");
+    web.ignoring().antMatchers("/css/**", "/js/**", "/img/**");
   }
 
   @Override
@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http
         .authorizeRequests()
         .antMatchers("/search/**").hasRole("MEMBER")
-        .antMatchers("/**", "/place/**").permitAll()
+        .antMatchers("/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .csrf()
@@ -54,11 +54,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .formLogin()
         .loginPage("/user/login")
         .defaultSuccessUrl("/user/login/result")
+        .failureUrl("/user/login/fail")
         .permitAll()
         .and()
         .logout()
         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-        .logoutSuccessUrl("/user/logout/result")
+        .logoutSuccessUrl("/user/login")
         .invalidateHttpSession(true)
         .and()
         .exceptionHandling().accessDeniedPage("/user/denied");
