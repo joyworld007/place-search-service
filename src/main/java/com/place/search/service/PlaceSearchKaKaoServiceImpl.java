@@ -7,7 +7,17 @@ import com.place.search.domain.common.ResultCode;
 import com.place.search.dto.TopSearchKeyword;
 import com.place.search.repository.TopSearchKeywordRedisRepository;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +78,9 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
     Optional<TopSearchKeyword> topSearchKeyword =
         topSearchKeywordRedisRepository.findById(TOP_SEARCH_KEYWORD_REDIS_KEY);
     if (topSearchKeyword.isPresent()) {
+
+
+
       return CommonResponseDto.builder()
           .result(Result.builder().entry(topSearchKeyword.get()).build())
           .build();
@@ -86,8 +99,8 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
           topSearchKeywordRedisRepository.findById(TOP_SEARCH_KEYWORD_REDIS_KEY);
       //데이터가 없다면 신규 생성
       if (!topSearchKeyword.isPresent()) {
-        TreeMap<String, Long> treeMap = new TreeMap<>();
-        treeMap.put(query, 1L);
+        Map<String, Integer> treeMap = new TreeMap<>();
+        treeMap.put(query, 1);
         TopSearchKeyword temp = TopSearchKeyword.builder()
             .id(TOP_SEARCH_KEYWORD_REDIS_KEY)
             .keywords(treeMap)
@@ -95,27 +108,49 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
         topSearchKeywordRedisRepository.save(temp);
       } else {
         //데이터가 있다면 검색어에 대한 조회 수 증가
-        TreeMap<String, Long> treeMap = topSearchKeyword.get().getKeywords();
-        if (!Optional.ofNullable(treeMap).isPresent()) {
-          //tree map 이 null 이면 최초 입력
-          TreeMap<String, Long> tempMap = new TreeMap<>();
-          tempMap.put(query, Long.valueOf(1L));
-          topSearchKeyword.get().setKeywords(tempMap);
+        Map<String, Integer> map = topSearchKeyword.get().getKeywords();
+        if (!Optional.ofNullable(map).isPresent()) {
+          //null 이면 최초 입력
+          Map<String, Integer> hashMap = new HashMap<>();
+          hashMap.put(query, 1);
+          topSearchKeyword.get().setKeywords(hashMap);
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
-        } else if (treeMap.containsKey(query)) {
+        } else if (map.containsKey(query)) {
           //키가 있으면 조회수 증가
-          treeMap.put(query, Long.valueOf(treeMap.get(query) + 1L));
-          topSearchKeyword.get().setKeywords(treeMap);
+          map.put(query, Integer.valueOf(map.get(query))+1);
+          topSearchKeyword.get().setKeywords(convertSortMap(map));
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         } else {
           //키 없으면 신규 입력
-          treeMap.put(query, Long.valueOf(1L));
-          topSearchKeyword.get().setKeywords(treeMap);
+          map.put(query, 1);
+          topSearchKeyword.get().setKeywords(convertSortMap(map));
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         }
       }
     } catch (Exception e) {
       log.error(e.getMessage());
     }
+  }
+
+  /**
+   * Map을 Value 내림차순 으로 정렬
+   * @param map
+   * @return
+   */
+  public Map<String, Integer> convertSortMap(Map<String, Integer> map) {
+    List<Entry<String, Integer>> list = new LinkedList<>(map.entrySet());
+    Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+      @Override
+      public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+        int comparision = (o1.getValue() - o2.getValue()) * -1;
+        return comparision == 0 ? o1.getKey().compareTo(o2.getKey()) : comparision;
+      }
+    });
+    Map<String, Integer> sortedMap = new LinkedHashMap<>();
+    for (Iterator<Entry<String, Integer>> iter = list.iterator(); iter.hasNext(); ) {
+      Map.Entry<String, Integer> entry = iter.next();
+      sortedMap.put(entry.getKey(), entry.getValue());
+    }
+    return sortedMap;
   }
 }

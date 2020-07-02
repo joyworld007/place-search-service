@@ -4,7 +4,15 @@ import com.place.search.dto.MemberDto;
 import com.place.search.dto.TopSearchKeyword;
 import com.place.search.repository.TopSearchKeywordRedisRepository;
 import com.place.search.service.MemberService;
-import java.util.TreeMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -25,11 +33,39 @@ public class DataLoader implements ApplicationRunner {
     memberService.joinUser(MemberDto.builder().email("test3@gmail.com").password("1234").build());
 
     //create top search keyowrd
-    TreeMap<String, Long> treeMap = new TreeMap<>();
+    Map<String, Integer> hashMap = new HashMap<>();
+    hashMap.put("서울역", 10000);
+    hashMap.put("삼성역", 9999);
+    hashMap.put("포스코", 9998);
+    hashMap.put("잠실역", 9997);
+    hashMap.put("교대역", 9996);
+    hashMap.put("남대문", 9995);
+    hashMap.put("에버랜드", 9994);
+    hashMap.put("롯데월드", 9993);
+    hashMap.put("어린이대공원", 9992);
+    hashMap.put("강남역", 9991);
+
     TopSearchKeyword temp = TopSearchKeyword.builder()
         .id(TOP_SEARCH_KEYWORD_REDIS_KEY)
-        .keywords(treeMap)
+        .keywords(convertSortMap(hashMap))
         .build();
     topSearchKeywordRedisRepository.save(temp);
+  }
+
+  public Map<String, Integer> convertSortMap(Map<String, Integer> map) {
+    List<Entry<String, Integer>> list = new LinkedList<>(map.entrySet());
+    Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+      @Override
+      public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+        int comparision = (o1.getValue() - o2.getValue()) * -1;
+        return comparision == 0 ? o1.getKey().compareTo(o2.getKey()) : comparision;
+      }
+    });
+    Map<String, Integer> sortedMap = new LinkedHashMap<>();
+    for (Iterator<Entry<String, Integer>> iter = list.iterator(); iter.hasNext(); ) {
+      Map.Entry<String, Integer> entry = iter.next();
+      sortedMap.put(entry.getKey(), entry.getValue());
+    }
+    return sortedMap;
   }
 }

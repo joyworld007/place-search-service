@@ -16,13 +16,13 @@
         <div class="col-lg-12">
           <div class="search-result-box card-box">
             <div class="row">
+
               <div class="col-md-8 offset-md-2" style="text-align: right">
                 <span class="mb-0 text-muted" sec:authentication="name"></span>님
                 <button class="icon_logout"><a class="mb-0 text-muted"
                                                sec:authorize="isAuthenticated()"
                                                th:href="@{/user/logout}">로그아웃</a></button>
               </div>
-              <p></p>
               <div class="col-md-8 offset-md-2">
                 <div class="pt-3 pb-4">
                   <div class="input-group">
@@ -34,9 +34,20 @@
                       </button>
                     </div>
                   </div>
+
+                  <p></p>
+                  <div class="block">
+                    <ul id="ticker">
+                      <li><a href="#"><span>1</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>
+                      <li><a href="#"><span>2</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>
+                      <li><a href="#"><span>3</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>
+                    </ul>
+                  </div>
+
                 </div>
               </div>
             </div>
+
             <!-- end row -->
             <div class="tab-content">
               <div class="tab-pane active" id="search-result">
@@ -154,7 +165,21 @@
     $('#btn-search').click(function () {
       search();
     });
+  });
 
+  $(function()
+  {
+    var ticker = function()
+    {
+      setTimeout(function(){
+        $('#ticker li:first').animate( {marginTop: '-20px'}, 400, function()
+        {
+          $(this).detach().appendTo('ul#ticker').removeAttr('style');
+        });
+        ticker();
+      }, 3000);
+    };
+    ticker();
   });
 </script>
 

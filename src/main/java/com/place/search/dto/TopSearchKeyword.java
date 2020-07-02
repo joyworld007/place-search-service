@@ -1,6 +1,6 @@
 package com.place.search.dto;
 
-import java.util.TreeMap;
+import java.util.Map;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +19,6 @@ public class TopSearchKeyword {
 
   @Id
   private String id;
-  private TreeMap<String, Long> keywords;
+  private Map<String, Integer> keywords;
 
 }
