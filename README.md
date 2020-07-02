@@ -47,7 +47,7 @@ Member
 
 TopSearchKeyword
       id
-      keywords
+      topKeywords
 ```
 
 ### <a name="chapter-5"></a>How to Run
