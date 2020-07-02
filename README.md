@@ -32,9 +32,9 @@
 
 ### <a name="chapter-3"></a>Strategy 
 ````
-로그인 구현 : Spring Security
-클라이언트 구현 : Thymeleaf template engine + wabjars(jquery + bootstrap)
-데이터베이스 : embedded h2 db(user), embedded redis(top keyword)
+Login : Spring Security
+Client : Thymeleaf template engine + wabjars(jquery + bootstrap)
+DB : embedded h2 db(user), embedded redis(top keyword)
 ````
 ### <a name="chapter-4"></a>Domain 
 ```
