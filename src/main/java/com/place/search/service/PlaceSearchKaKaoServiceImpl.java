@@ -37,28 +37,23 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
   final private String TOP_SEARCH_KEYWORD_REDIS_KEY = "topSearchKeyword";
 
   @Override
-  public CommonResponseDto placeSearchByKeyword(String query, int page, int size) {
+  public CommonResponseDto searchByKeyword(String query, int page, int size) {
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
         .queryParam("query", query)
         .queryParam("page", page)
         .queryParam("size", size)
         .encode(StandardCharsets.UTF_8);
-
     HttpHeaders headers = new HttpHeaders();
     headers.add("Authorization", "KakaoAK " + appKey);
     HttpEntity entity = new HttpEntity<>(headers);
-
     try {
       ResponseEntity<ApiResponse> response = restTemplate
           .exchange(builder.build().encode().toUri(), HttpMethod.GET, entity, ApiResponse.class);
-
       if (response.getStatusCode() != HttpStatus.OK) {
         return CommonResponseDto.builder().code(ResultCode.FAIL.toString()).build();
       }
-
       //탑 키워드 저장
       modifyTopSearchKeyword(query);
-
       return CommonResponseDto.builder()
           .result(Result.builder().entry(response.getBody()).build())
           .build();
@@ -68,40 +63,54 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
     }
   }
 
+  @Override
+  public CommonResponseDto searchTopKeyword() {
+    Optional<TopSearchKeyword> topSearchKeyword =
+        topSearchKeywordRedisRepository.findById(TOP_SEARCH_KEYWORD_REDIS_KEY);
+    if (topSearchKeyword.isPresent()) {
+      return CommonResponseDto.builder()
+          .result(Result.builder().entry(topSearchKeyword.get()).build())
+          .build();
+    } else {
+      return CommonResponseDto.builder().code(ResultCode.FAIL.toString()).build();
+    }
+  }
+
+  /**
+   * TOP Keyword를 Redis에 저장
+   * @param query 검색어
+   */
   public void modifyTopSearchKeyword(String query) {
     try {
-      //Top 키워드 load & update
       Optional<TopSearchKeyword> topSearchKeyword =
           topSearchKeywordRedisRepository.findById(TOP_SEARCH_KEYWORD_REDIS_KEY);
-
       //데이터가 없다면 신규 생성
       if (!topSearchKeyword.isPresent()) {
         TreeMap<String, Long> treeMap = new TreeMap<>();
         treeMap.put(query, 1L);
         TopSearchKeyword temp = TopSearchKeyword.builder()
             .id(TOP_SEARCH_KEYWORD_REDIS_KEY)
-            .treeMap(treeMap)
+            .keywords(treeMap)
             .build();
         topSearchKeywordRedisRepository.save(temp);
       } else {
         //데이터가 있다면 검색어에 대한 조회 수 증가
-        TreeMap<String, Long> treeMap = topSearchKeyword.get().getTreeMap();
-
+        TreeMap<String, Long> treeMap = topSearchKeyword.get().getKeywords();
         if (!Optional.ofNullable(treeMap).isPresent()) {
           //tree map 이 null 이면 최초 입력
           TreeMap<String, Long> tempMap = new TreeMap<>();
           tempMap.put(query, Long.valueOf(1L));
-          topSearchKeyword.get().setTreeMap(tempMap);
+          topSearchKeyword.get().setKeywords(tempMap);
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         } else if (treeMap.containsKey(query)) {
           //키가 있으면 조회수 증가
           treeMap.put(query, Long.valueOf(treeMap.get(query) + 1L));
-          topSearchKeyword.get().setTreeMap(treeMap);
+          topSearchKeyword.get().setKeywords(treeMap);
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         } else {
           //키 없으면 신규 입력
           treeMap.put(query, Long.valueOf(1L));
-          topSearchKeyword.get().setTreeMap(treeMap);
+          topSearchKeyword.get().setKeywords(treeMap);
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         }
       }

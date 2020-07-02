@@ -5,5 +5,6 @@ import com.place.search.domain.common.CommonResponseDto;
 
 public interface PlaceSearchService {
 
-  CommonResponseDto placeSearchByKeyword(String keyword, int page, int size);
+  CommonResponseDto searchByKeyword(String keyword, int page, int size);
+  CommonResponseDto searchTopKeyword();
 }

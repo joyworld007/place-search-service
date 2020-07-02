@@ -28,7 +28,7 @@ public class DataLoader implements ApplicationRunner {
     TreeMap<String, Long> treeMap = new TreeMap<>();
     TopSearchKeyword temp = TopSearchKeyword.builder()
         .id(TOP_SEARCH_KEYWORD_REDIS_KEY)
-        .treeMap(treeMap)
+        .keywords(treeMap)
         .build();
     topSearchKeywordRedisRepository.save(temp);
   }

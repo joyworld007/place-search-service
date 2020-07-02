@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/place")
+@RequestMapping("/v1/places")
 public class PlaceSearchApiController {
 
   final private PlaceSearchService placeSearchService;
@@ -27,7 +27,19 @@ public class PlaceSearchApiController {
   ) {
     try {
       CommonResponseDto commonResponseDto = placeSearchService
-          .placeSearchByKeyword(query, page, size);
+          .searchByKeyword(query, page, size);
+      return CommonResponseEntity.ok(commonResponseDto.getResult());
+    } catch (Exception e) {
+      CommonResponseEntity.fail("Fail", "Fail");
+    }
+    return CommonResponseEntity.ok();
+  }
+
+  @GetMapping("/top-keyword")
+  public ResponseEntity searchTopKeyword() {
+    try {
+      CommonResponseDto commonResponseDto = placeSearchService
+          .searchTopKeyword();
       return CommonResponseEntity.ok(commonResponseDto.getResult());
     } catch (Exception e) {
       CommonResponseEntity.fail("Fail", "Fail");

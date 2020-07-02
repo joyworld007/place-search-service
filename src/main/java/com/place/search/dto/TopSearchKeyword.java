@@ -19,6 +19,6 @@ public class TopSearchKeyword {
 
   @Id
   private String id;
-  private TreeMap<String, Long> treeMap;
+  private TreeMap<String, Long> keywords;
 
 }
