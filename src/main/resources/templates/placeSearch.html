@@ -18,7 +18,9 @@
             <div class="row">
               <div class="col-md-8 offset-md-2" style="text-align: right">
                 <span class="mb-0 text-muted" sec:authentication="name"></span>님
-                <button class="icon_logout"><a class="mb-0 text-muted" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a></button>
+                <button class="icon_logout"><a class="mb-0 text-muted"
+                                               sec:authorize="isAuthenticated()"
+                                               th:href="@{/user/logout}">로그아웃</a></button>
               </div>
               <p></p>
               <div class="col-md-8 offset-md-2">
@@ -36,11 +38,6 @@
               </div>
             </div>
             <!-- end row -->
-            <ul class="nav nav-tabs tabs-bordered" id="search-result-tab">
-              <li class="nav-item"><a href="#home" data-toggle="tab" aria-expanded="true"
-                                      class="nav-link active">검색결과 <span
-                  class="badge badge-success ml-1" id="result_count"></span></a></li>
-            </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="search-result">
                 <div class="row">
@@ -48,40 +45,33 @@
                   <div class="col-md-12" id="result-list"></div>
                   <!-- 검색 결과 List-->
 
-                  <div id="paging" class="col-md-12">
-                    <ul class="pagination justify-content-end pagination-split mt-0">
-                      <li class="page-item"><a class="page-link" href="#"
-                                               aria-label="Previous"><span
-                          aria-hidden="true">«</span> <span class="sr-only">Previous</span></a></li>
-                      <li class="page-item"><a class="page-link" href="#">1</a></li>
-                      <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                      <li class="page-item"><a class="page-link" href="#">3</a></li>
-                      <li class="page-item"><a class="page-link" href="#">4</a></li>
-                      <li class="page-item"><a class="page-link" href="#">5</a></li>
-                      <li class="page-item"><a class="page-link" href="#" aria-label="Next"><span
-                          aria-hidden="true">»</span> <span class="sr-only">Next</span></a></li>
-                    </ul>
+                  <!--paging-->
+                  <div class="text-center">
+                    <ul id="pagination" class="pagination-lg"></ul>
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- end row -->
     </div>
-    <!-- container -->
+    <!-- end row -->
+  </div>
+  <!-- container -->
   </div>
 </form>
 
 <script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
 <script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="/js/jquery.twbsPagination.js"></script>
+
 <script>
   let totalCount = 0;
+  let totalDetailCount = 0;
 
   function show(index) {
-    for (let i = 0; i < totalCount; i++) {
+    for (let i = 0; i < totalDetailCount; i++) {
       $('#detail' + i).hide();
     }
     $('#detail' + index).show();
@@ -89,7 +79,6 @@
 
   function search() {
     $('#result-list').html('');
-
     if ($('#query').val() == '') {
       return;
     }
@@ -108,19 +97,16 @@
             let obj = JSON.parse(res);
             console.log(obj)
             if (obj.code == 'SUCCESS') {
-
-              totalCount = obj.result.entry.documents.length;
-
+              totalCount = obj.result.entry.meta.pageable_count;
+              totalDetailCount = obj.result.entry.documents.length;
               $('#search-result').show();
-              $('#search-result-tab').show();
-              $('#result_count').text(obj.result.entry.meta.pageable_count)
             }
             for (let i = 0; i < obj.result.entry.documents.length; i++) {
               let list = obj.result.entry.documents[i];
               let html = '<div class="search-item" id="">';
-              html += '<h4 class="mb-1"><a href="javascript:show(' + i + ')">' + list.place_name
-                  + '</a></h4>';
-              html += '<div class="font-13 text-success mb-3">' + list.category_name + '</div>';
+              html += '<h5 class="mb-1"><a href="javascript:show(' + i + ')">' + list.place_name
+                  + '</a></h5>';
+              html += '<div class="font-12 text-success mb-3">' + list.category_name + '</div>';
 
               html += '<div id="detail' + i + '" style="display:none;>"';
               html += '<p class="mb-0 text-muted"> 지번 : ' + list.address_name;
@@ -134,6 +120,22 @@
               $('#result-list').append(html);
             }
 
+            //페이징 그리기
+            let pageTemp = totalCount / $('#size').val();
+            if (totalCount % $('#size').val() > 0) {
+              pageTemp++;
+            }
+
+            $('#pagination').twbsPagination({
+              totalPages: pageTemp,
+              visiblePages: 5,
+              initiateStartPageClick: false,
+              onPageClick: function (event, page) {
+                console.log('page : ' + page)
+                $('#page').val(page);
+                search();
+              }
+            });
           },
           error: function (xhr, status, error) {
             console.log(error);
@@ -152,6 +154,7 @@
     $('#btn-search').click(function () {
       search();
     });
+
   });
 </script>
 
