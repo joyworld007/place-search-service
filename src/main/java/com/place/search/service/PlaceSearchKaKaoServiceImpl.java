@@ -4,9 +4,11 @@ import com.place.search.domain.common.ApiResponse;
 import com.place.search.domain.common.CommonResponseDto;
 import com.place.search.domain.common.Result;
 import com.place.search.domain.common.ResultCode;
+import com.place.search.dto.TopKeyword;
 import com.place.search.dto.TopSearchKeyword;
 import com.place.search.repository.TopSearchKeywordRedisRepository;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,11 +79,15 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
     Optional<TopSearchKeyword> topSearchKeyword =
         topSearchKeywordRedisRepository.findById(TOP_SEARCH_KEYWORD_REDIS_KEY);
     if (topSearchKeyword.isPresent()) {
+      topSearchKeyword.get().setKeywords(null);
 
-
-
+      List<TopKeyword> temp = new ArrayList<>();
+      for (int i = 0; i < topSearchKeyword.get().getTopKeywords().size(); i++) {
+        temp.add(topSearchKeyword.get().getTopKeywords().get(i));
+        if(i == 9) break;
+      }
       return CommonResponseDto.builder()
-          .result(Result.builder().entry(topSearchKeyword.get()).build())
+          .result(Result.builder().entry(temp).build())
           .build();
     } else {
       return CommonResponseDto.builder().code(ResultCode.FAIL.toString()).build();
@@ -91,6 +96,7 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
 
   /**
    * TOP Keyword를 Redis에 저장
+   *
    * @param query 검색어
    */
   public void modifyTopSearchKeyword(String query) {
@@ -104,6 +110,7 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
         TopSearchKeyword temp = TopSearchKeyword.builder()
             .id(TOP_SEARCH_KEYWORD_REDIS_KEY)
             .keywords(treeMap)
+            .topKeywords(convertMapToList(treeMap))
             .build();
         topSearchKeywordRedisRepository.save(temp);
       } else {
@@ -114,16 +121,22 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
           Map<String, Integer> hashMap = new HashMap<>();
           hashMap.put(query, 1);
           topSearchKeyword.get().setKeywords(hashMap);
+          topSearchKeyword.get()
+              .setTopKeywords(convertMapToList(topSearchKeyword.get().getKeywords()));
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         } else if (map.containsKey(query)) {
           //키가 있으면 조회수 증가
-          map.put(query, Integer.valueOf(map.get(query))+1);
+          map.put(query, Integer.valueOf(map.get(query)) + 1);
           topSearchKeyword.get().setKeywords(convertSortMap(map));
+          topSearchKeyword.get()
+              .setTopKeywords(convertMapToList(topSearchKeyword.get().getKeywords()));
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         } else {
           //키 없으면 신규 입력
           map.put(query, 1);
           topSearchKeyword.get().setKeywords(convertSortMap(map));
+          topSearchKeyword.get()
+              .setTopKeywords(convertMapToList(topSearchKeyword.get().getKeywords()));
           topSearchKeywordRedisRepository.save(topSearchKeyword.get());
         }
       }
@@ -134,6 +147,7 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
 
   /**
    * Map을 Value 내림차순 으로 정렬
+   *
    * @param map
    * @return
    */
@@ -152,5 +166,15 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
       sortedMap.put(entry.getKey(), entry.getValue());
     }
     return sortedMap;
+  }
+
+  public List<TopKeyword> convertMapToList(Map<String, Integer> map) {
+    List<TopKeyword> topKeywords = new ArrayList<>();
+    for (Map.Entry<String, Integer> entry : map.entrySet()) {
+      String keyword = entry.getKey();
+      int count = entry.getValue();
+      topKeywords.add(TopKeyword.builder().keyword(keyword).count(count).build());
+    }
+    return topKeywords;
   }
 }

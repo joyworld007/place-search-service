@@ -66,6 +66,9 @@ TopSearchKeyword
 
 1. Spring Boot Application을 실행 합니다. 
 
-2. http://localhost:8080 접속 후 미리 생성해 놓은 테스트 계정으로 로그인 합니다(test1@gmail.com / 1234)
+2. http://localhost:8080 접속 후 미리 생성해 놓은 테스트 계정으로 로그인 합니다
+   - test1@gmail.com / 1234 
+   - test2@gmail.com / 1234
+   - test3@gmail.com / 1234
  
 3. 로그인 후 키워드로 장소 검색을 합니다

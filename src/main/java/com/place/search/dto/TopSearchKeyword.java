@@ -1,5 +1,7 @@
 package com.place.search.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 import java.util.Map;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,8 @@ public class TopSearchKeyword {
 
   @Id
   private String id;
+  @JsonIgnoreProperties
   private Map<String, Integer> keywords;
-
+  @JsonIgnoreProperties
+  private List<TopKeyword> topKeywords;
 }

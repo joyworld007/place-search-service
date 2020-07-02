@@ -1,9 +1,11 @@
 package com.place.search;
 
 import com.place.search.dto.MemberDto;
+import com.place.search.dto.TopKeyword;
 import com.place.search.dto.TopSearchKeyword;
 import com.place.search.repository.TopSearchKeywordRedisRepository;
 import com.place.search.service.MemberService;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -36,18 +38,21 @@ public class DataLoader implements ApplicationRunner {
     Map<String, Integer> hashMap = new HashMap<>();
     hashMap.put("서울역", 10000);
     hashMap.put("삼성역", 9999);
-    hashMap.put("포스코", 9998);
+    hashMap.put("상갈역", 9998);
     hashMap.put("잠실역", 9997);
     hashMap.put("교대역", 9996);
     hashMap.put("남대문", 9995);
     hashMap.put("에버랜드", 9994);
     hashMap.put("롯데월드", 9993);
-    hashMap.put("어린이대공원", 9992);
+    hashMap.put("대공원", 9992);
     hashMap.put("강남역", 9991);
+    hashMap.put("역삼역", 9990);
 
+    Map<String, Integer> sortedMap = convertSortMap(hashMap);
     TopSearchKeyword temp = TopSearchKeyword.builder()
         .id(TOP_SEARCH_KEYWORD_REDIS_KEY)
-        .keywords(convertSortMap(hashMap))
+        .keywords(sortedMap)
+        .topKeywords(convertMapToList(sortedMap))
         .build();
     topSearchKeywordRedisRepository.save(temp);
   }
@@ -67,5 +72,15 @@ public class DataLoader implements ApplicationRunner {
       sortedMap.put(entry.getKey(), entry.getValue());
     }
     return sortedMap;
+  }
+
+  public List<TopKeyword> convertMapToList(Map<String, Integer> map) {
+    List<TopKeyword> topKeywords = new ArrayList<>();
+    for (Map.Entry<String, Integer> entry : map.entrySet()) {
+      String keyword = entry.getKey();
+      int count = entry.getValue();
+      topKeywords.add(TopKeyword.builder().keyword(keyword).count(count).build());
+    }
+    return topKeywords;
   }
 }

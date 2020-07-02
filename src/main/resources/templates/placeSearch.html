@@ -38,9 +38,9 @@
                   <p></p>
                   <div class="block">
                     <ul id="ticker">
-                      <li><a href="#"><span>1</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>
-                      <li><a href="#"><span>2</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>
-                      <li><a href="#"><span>3</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>
+                      <!--                      <li><a href="#"><span>1</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>-->
+                      <!--                      <li><a href="#"><span>2</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>-->
+                      <!--                      <li><a href="#"><span>3</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>-->
                     </ul>
                   </div>
 
@@ -136,13 +136,11 @@
             if (totalCount % $('#size').val() > 0) {
               pageTemp++;
             }
-
             $('#pagination').twbsPagination({
               totalPages: pageTemp,
               visiblePages: 5,
               initiateStartPageClick: false,
               onPageClick: function (event, page) {
-                console.log('page : ' + page)
                 $('#page').val(page);
                 search();
               }
@@ -156,6 +154,42 @@
     return false;
   }
 
+  function updataTopSearchKeyword() {
+    $('#ticker').html('');
+    $.ajax(
+        {
+          type: "GET",
+          url: '/v1/places/top-keywords',
+          contentType: "application/json",
+          dataType: "text",
+          success: function (res) {
+            let obj = JSON.parse(res);
+            console.log(obj)
+            if (obj.code == 'SUCCESS') {
+              for (var i = 0; i < obj.result.entry.length; i++) {
+                var list = obj.result.entry[i];
+                var html = '<li><a href="javascript:topKeyWordSearch(\'' + list.keyword + '\')"><span>' + parseInt(i+1) + '</span>'
+                    + '검색어 : ' + list.keyword + ' | 조회수 : ' + list.count
+                    + '</a></li>';
+                $('#ticker').append(html);
+              }
+            }
+          },
+          error: function (xhr, status, error) {
+            console.log(error);
+          }
+        }
+    );
+    return false;
+  }
+
+  function topKeyWordSearch(keyword) {
+    $('#query').val(keyword);
+    $('#page').val(1);
+    $('#pagination').twbsPagination('destroy');
+    search();
+  }
+
   $(document).ready(function () {
 
     $('#result-list').html('');
@@ -163,17 +197,17 @@
     $('#search-result-tab').hide();
 
     $('#btn-search').click(function () {
+      $('#page').val(1);
+      $('#pagination').twbsPagination('destroy');
       search();
     });
+    updataTopSearchKeyword();
   });
 
-  $(function()
-  {
-    var ticker = function()
-    {
-      setTimeout(function(){
-        $('#ticker li:first').animate( {marginTop: '-20px'}, 400, function()
-        {
+  $(function () {
+    var ticker = function () {
+      setTimeout(function () {
+        $('#ticker li:first').animate({marginTop: '-20px'}, 400, function () {
           $(this).detach().appendTo('ul#ticker').removeAttr('style');
         });
         ticker();

@@ -2,7 +2,12 @@ package com.place.search.controller;
 
 import com.place.search.domain.common.CommonResponseDto;
 import com.place.search.domain.common.CommonResponseEntity;
+import com.place.search.dto.TopKeyword;
+import com.place.search.dto.TopSearchKeyword;
 import com.place.search.service.PlaceSearchService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +40,7 @@ public class PlaceSearchApiController {
     return CommonResponseEntity.ok();
   }
 
-  @GetMapping("/top-keyword")
+  @GetMapping("/top-keywords")
   public ResponseEntity searchTopKeyword() {
     try {
       CommonResponseDto commonResponseDto = placeSearchService
@@ -46,4 +51,5 @@ public class PlaceSearchApiController {
     }
     return CommonResponseEntity.ok();
   }
+
 }
