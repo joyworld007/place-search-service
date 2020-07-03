@@ -16,9 +16,11 @@
  Spring Security
  Spring Data JPA
  Spring Data Redis
+ Embedded H2 DB 
  Embedded Redis 
  Thymeleaf 
  WebJars
+ Junit5
 ````
 
 ### <a name="chapter-2"></a>Requirement 
