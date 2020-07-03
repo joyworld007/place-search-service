@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,20 +66,15 @@ public class DataLoader implements ApplicationRunner {
       }
     });
     Map<String, Integer> sortedMap = new LinkedHashMap<>();
-    for (Iterator<Entry<String, Integer>> iter = list.iterator(); iter.hasNext(); ) {
-      Map.Entry<String, Integer> entry = iter.next();
-      sortedMap.put(entry.getKey(), entry.getValue());
-    }
+    list.forEach(t -> sortedMap.put(t.getKey(), t.getValue()));
     return sortedMap;
   }
 
   public List<TopKeyword> convertMapToList(Map<String, Integer> map) {
     List<TopKeyword> topKeywords = new ArrayList<>();
-    for (Map.Entry<String, Integer> entry : map.entrySet()) {
-      String keyword = entry.getKey();
-      int count = entry.getValue();
-      topKeywords.add(TopKeyword.builder().keyword(keyword).count(count).build());
-    }
+    map.entrySet().forEach(t ->
+        topKeywords.add(TopKeyword.builder().keyword(t.getKey()).count(t.getValue()).build())
+    );
     return topKeywords;
   }
 }

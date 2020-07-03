@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,7 +83,9 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
       List<TopKeyword> temp = new ArrayList<>();
       for (int i = 0; i < topSearchKeyword.get().getTopKeywords().size(); i++) {
         temp.add(topSearchKeyword.get().getTopKeywords().get(i));
-        if(i == 9) break;
+        if (i == 9) {
+          break;
+        }
       }
       return CommonResponseDto.builder()
           .result(Result.builder().entry(temp).build())
@@ -103,8 +104,8 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
     try {
       Optional<TopSearchKeyword> topSearchKeyword =
           topSearchKeywordRedisRepository.findById(TOP_SEARCH_KEYWORD_REDIS_KEY);
-      //데이터가 없다면 신규 생성
       if (!topSearchKeyword.isPresent()) {
+        //데이터가 없다면 신규 생성
         Map<String, Integer> treeMap = new TreeMap<>();
         treeMap.put(query, 1);
         TopSearchKeyword temp = TopSearchKeyword.builder()
@@ -161,20 +162,20 @@ public class PlaceSearchKaKaoServiceImpl implements PlaceSearchService {
       }
     });
     Map<String, Integer> sortedMap = new LinkedHashMap<>();
-    for (Iterator<Entry<String, Integer>> iter = list.iterator(); iter.hasNext(); ) {
-      Map.Entry<String, Integer> entry = iter.next();
-      sortedMap.put(entry.getKey(), entry.getValue());
-    }
+    list.forEach(t -> sortedMap.put(t.getKey(), t.getValue()));
     return sortedMap;
   }
 
+  /**
+   * Map을 TopKeyword Object List로 변환
+   * @param map
+   * @return
+   */
   public List<TopKeyword> convertMapToList(Map<String, Integer> map) {
     List<TopKeyword> topKeywords = new ArrayList<>();
-    for (Map.Entry<String, Integer> entry : map.entrySet()) {
-      String keyword = entry.getKey();
-      int count = entry.getValue();
-      topKeywords.add(TopKeyword.builder().keyword(keyword).count(count).build());
-    }
+    map.entrySet().forEach(t ->
+        topKeywords.add(TopKeyword.builder().keyword(t.getKey()).count(t.getValue()).build())
+    );
     return topKeywords;
   }
 }

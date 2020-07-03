@@ -8,7 +8,6 @@
 * [How to run](#chapter-5)
 * [How to Test](#chapter-6)
 
-
 ### <a name="chapter-1"></a>Specifications 
 ````
  OpenJDK11
@@ -18,9 +17,8 @@
  Spring Data Redis
  Embedded H2 DB 
  Embedded Redis 
- Thymeleaf 
- WebJars
- Junit5
+ Thymeleaf Template Engine 
+ Junit5 Test
 ````
 
 ### <a name="chapter-2"></a>Requirement 
