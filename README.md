@@ -78,7 +78,7 @@ TopSearchKeyword
 <img src="src/docs/2.png" witdh="1024" height="768">
 
 4. 검색 결과를 클릭하여 상세 보기를 노출 합니다.
-<img src="src/docs/3.png" witdh="1024" height="500">
+<img src="src/docs/3.png" witdh="1024" height="400">
 
 5. Daum 지도 바로 가기 버튼을 클릭하여 해당 지역의 지도를 확인 합니다
-<img src="src/docs/4.png" witdh="1024" height="768"> 
+<img src="src/docs/4.png" witdh="1024" height="600"> 
