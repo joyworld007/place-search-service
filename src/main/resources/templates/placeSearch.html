@@ -37,13 +37,8 @@
 
                   <p></p>
                   <div class="block">
-                    <ul id="ticker">
-                      <!--                      <li><a href="#"><span>1</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>-->
-                      <!--                      <li><a href="#"><span>2</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>-->
-                      <!--                      <li><a href="#"><span>3</span> 검색어 : 김연아 | 조회수 : 1024</b></a></li>-->
-                    </ul>
+                    <ul id="ticker"></ul>
                   </div>
-
                 </div>
               </div>
             </div>
@@ -168,9 +163,10 @@
             if (obj.code == 'SUCCESS') {
               for (var i = 0; i < obj.result.entry.length; i++) {
                 var list = obj.result.entry[i];
-                var html = '<li><a href="javascript:topKeyWordSearch(\'' + list.keyword + '\')"><span>' + parseInt(i+1) + '</span>'
-                    + '검색어 : ' + list.keyword + ' | 조회수 : ' + list.count
-                    + '</a></li>';
+                var html = '<li><a href="javascript:topKeyWordSearch(\'' + list.keyword
+                    + '\')"><span>' + parseInt(i + 1) + '</span>'
+                    + '<b>검색어 : ' + list.keyword + '   |   조회수 : ' + list.count
+                    + '</b></a></li>';
                 $('#ticker').append(html);
               }
             }

@@ -2,12 +2,7 @@ package com.place.search.controller;
 
 import com.place.search.domain.common.CommonResponseDto;
 import com.place.search.domain.common.CommonResponseEntity;
-import com.place.search.dto.TopKeyword;
-import com.place.search.dto.TopSearchKeyword;
 import com.place.search.service.PlaceSearchService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/places")
-public class PlaceSearchApiController {
+public class SearchApiController {
 
   final private PlaceSearchService placeSearchService;
 
