@@ -30,7 +30,7 @@ public class SecurityTest {
 
   @WithMockUser(roles = "TEST")
   @Test
-  public void givenAuthRequestService_shouldFailWith403() throws Exception {
+  public void givenNonAuthRequestService_shouldFailWith403() throws Exception {
     mvc.perform(get("/search"))
         .andExpect(status().is4xxClientError());
   }
