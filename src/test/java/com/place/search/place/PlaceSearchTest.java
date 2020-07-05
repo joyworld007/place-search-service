@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.place.search.controller.SearchApiController;
 import com.place.search.domain.common.ApiResponse;
 import com.place.search.domain.common.CommonResponseDto;
+import com.place.search.domain.common.Document;
 import com.place.search.domain.common.Result;
 import com.place.search.dto.TopKeyword;
 import com.place.search.repository.TopSearchKeywordRedisRepository;
@@ -63,26 +64,38 @@ public class PlaceSearchTest {
   private ResponseEntity<ApiResponse> responseEntity;
   private UriComponentsBuilder builder;
   HttpEntity entity;
-  List documents;
+  List<Document> documents;
+  List<TopKeyword> topKeywords;
 
   private void rawSetup(TestInfo testInfo) {
-    //create top search keyowrd
+    switch (testInfo.getDisplayName()) {
+      case "searchByKeyword Test":
+        //create top search keyowrd
+        documents = new ArrayList<>();
+        Document document1 = Document.builder()
+            .address_name("삼성역")
+            .id(21160620L).build();
+        documents.add(document1);
+        apiResponse = ApiResponse.builder().documents(documents).build();
+        break;
 
-    Map<String, Integer> hashMap = new HashMap<>();
-    hashMap.put("강남역", 9991);
-    hashMap.put("서울역", 10000);
-    hashMap.put("삼성역", 9999);
-    hashMap.put("상갈역", 9998);
-    hashMap.put("잠실역", 9997);
-    hashMap.put("교대역", 9996);
-    hashMap.put("남대문", 9995);
-    hashMap.put("에버랜드", 9994);
-    hashMap.put("롯데월드", 9993);
-    hashMap.put("대공원", 9992);
-    Map<String, Integer> sortedMap = convertSortMap(hashMap);
-    documents = convertMapToList(sortedMap);
-    apiResponse = ApiResponse.builder().documents(documents).build();
-    responseEntity = ResponseEntity.ok(apiResponse);
+      case "searchTopKeyword Test":
+        //create top search keyowrd
+        Map<String, Integer> hashMap = new HashMap<>();
+        hashMap.put("강남역", 9991);
+        hashMap.put("서울역", 10000);
+        hashMap.put("삼성역", 9999);
+        hashMap.put("상갈역", 9998);
+        hashMap.put("잠실역", 9997);
+        hashMap.put("교대역", 9996);
+        hashMap.put("남대문", 9995);
+        hashMap.put("에버랜드", 9994);
+        hashMap.put("롯데월드", 9993);
+        hashMap.put("대공원", 9992);
+        Map<String, Integer> sortedMap = convertSortMap(hashMap);
+        topKeywords = convertMapToList(sortedMap);
+        break;
+    }
   }
 
   @DisplayName("searchByKeyword Test")
@@ -102,7 +115,26 @@ public class PlaceSearchTest {
         .queryParam("page", "1")
         .queryParam("size", "5"))
         .andExpect(status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.result.entry.documents[0].count")
+        .andExpect(MockMvcResultMatchers.jsonPath("$.result.entry.documents[0].id")
+            .value(21160620L))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.code")
+            .value("SUCCESS"));
+  }
+
+  @Test
+  @DisplayName("searchTopKeyword Test")
+  public void searchTopKeywordTest() throws Exception {
+    CommonResponseDto commonResponseDto = CommonResponseDto.builder().result(
+        Result.builder().entry(topKeywords).build()
+    ).code("SUCCESS").build();
+
+    given(placeSearchKaKaoService.searchTopKeyword())
+        .willReturn(commonResponseDto);
+
+    mockMvc.perform(get("/v1/places/top-keywords")
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.result.entry[0].count")
             .value(10000))
         .andExpect(MockMvcResultMatchers.jsonPath("$.code")
             .value("SUCCESS"));
